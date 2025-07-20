@@ -1,0 +1,53 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ruoyi-api
+  profiles:
+    active: dev
+
+# 阿里云录音文件识别配置
+aliyun:
+  isi:
+    # 阿里云访问密钥ID（请替换为实际的AccessKeyId）
+    access-key-id: ${ALIYUN_ACCESS_KEY_ID:your-access-key-id}
+    # 阿里云访问密钥Secret（请替换为实际的AccessKeySecret）
+    access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:your-access-key-secret}
+    # 阿里云区域ID
+    region-id: cn-shanghai
+    # 录音文件识别服务端点
+    endpoint: https://isi.cn-shanghai.aliyuncs.com
+    # 连接超时时间（毫秒）
+    connect-timeout: 10000
+    # 读取超时时间（毫秒）
+    read-timeout: 30000
+    # 最大重试次数
+    max-retries: 3
+    # 重试间隔时间（毫秒）
+    retry-interval: 1000
+
+# Sa-Token配置
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: Authorization
+  # token有效期，单位s 默认30天, -1代表永不过期
+  timeout: 2592000
+  # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+  activity-timeout: -1
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: false
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+
+# 日志配置
+logging:
+  level:
+    org.dromara.api.aliyun.isi: DEBUG
+    org.springframework.web.client: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
