@@ -1,4 +1,4 @@
-package org.dromara.api.aliyun.isi.domain.vo;
+package org.dromara.api.recognize.aliyun.domain.vo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

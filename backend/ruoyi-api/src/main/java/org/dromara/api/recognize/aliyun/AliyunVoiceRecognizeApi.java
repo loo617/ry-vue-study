@@ -1,91 +1,83 @@
-package org.dromara.api.aliyun.isi.service.impl;
+package org.dromara.api.recognize.aliyun;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.api.aliyun.isi.config.AliyunIsiProperties;
-import org.dromara.api.aliyun.isi.domain.bo.IsiTaskBo;
-import org.dromara.api.aliyun.isi.domain.vo.IsiTaskVo;
-import org.dromara.api.aliyun.isi.service.IAliyunIsiService;
-import org.dromara.api.aliyun.isi.util.AliyunSignatureUtil;
-import org.dromara.api.aliyun.isi.util.RetryUtil;
+import org.dromara.api.recognize.aliyun.config.AliyunIsiProperties;
+import org.dromara.api.recognize.aliyun.domain.bo.IsiTaskBo;
+import org.dromara.api.recognize.aliyun.domain.vo.IsiTaskVo;
+import org.dromara.api.recognize.aliyun.util.AliyunSignatureUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 阿里云录音文件识别服务实现
- *
- * @author Lion Li
- */
 @Slf4j
-@Service
-@RequiredArgsConstructor
-public class AliyunIsiServiceImpl implements IAliyunIsiService {
+@Component
+public class AliyunVoiceRecognizeApi {
 
-    private final AliyunIsiProperties aliyunIsiProperties;
-    
-    @Qualifier("aliyunIsiRestClient")
-    private final RestClient restClient;
+    @Resource
+    private AliyunIsiProperties aliyunIsiProperties;
 
-    @Override
+    @Resource(name = "aliyunRestClient")
+    private RestClient restClient;
+
+
+
     public IsiTaskVo submitTask(IsiTaskBo taskBo) {
         log.info("提交录音文件识别任务: {}", taskBo.getFileLink());
-        
-        return RetryUtil.executeWithRetry(() -> {
-            Map<String, String> parameters = buildSubmitTaskParameters(taskBo);
-            Map<String, String> headers = AliyunSignatureUtil.generateSignature(
-                    aliyunIsiProperties.getAccessKeyId(),
-                    aliyunIsiProperties.getAccessKeySecret(),
-                    "POST",
-                    parameters
-            );
+        Map<String, String> parameters = buildSubmitTaskParameters(taskBo);
+        Map<String, String> headers = AliyunSignatureUtil.generateSignature(
+                aliyunIsiProperties.getAccessKeyId(),
+                aliyunIsiProperties.getAccessKeySecret(),
+                "POST",
+                parameters
+        );
 
-            HttpHeaders httpHeaders = new HttpHeaders();
-            headers.forEach(httpHeaders::add);
-            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        headers.forEach(httpHeaders::add);
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            String requestBody = buildRequestBody(parameters);
-            HttpEntity<String> entity = new HttpEntity<>(requestBody, httpHeaders);
+        String requestBody = buildRequestBody(parameters);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, httpHeaders);
 
-            return restClient.method(HttpMethod.POST)
-                    .uri(aliyunIsiProperties.getEndpoint())
-                    .body(entity)
-                    .retrieve()
-                    .body(IsiTaskVo.class);
-        }, aliyunIsiProperties.getMaxRetries(), aliyunIsiProperties.getRetryInterval());
+        return restClient.method(HttpMethod.POST)
+                .uri(aliyunIsiProperties.getEndpoint())
+                .body(entity)
+                .retrieve()
+                .body(IsiTaskVo.class);
     }
 
-    @Override
     public IsiTaskVo queryTask(String taskId) {
         log.info("查询录音文件识别任务状态: {}", taskId);
-        
-        return RetryUtil.executeWithRetry(() -> {
-            Map<String, String> parameters = buildQueryTaskParameters(taskId);
-            Map<String, String> headers = AliyunSignatureUtil.generateSignature(
-                    aliyunIsiProperties.getAccessKeyId(),
-                    aliyunIsiProperties.getAccessKeySecret(),
-                    "GET",
-                    parameters
-            );
+        Map<String, String> parameters = buildQueryTaskParameters(taskId);
+        Map<String, String> headers = AliyunSignatureUtil.generateSignature(
+                aliyunIsiProperties.getAccessKeyId(),
+                aliyunIsiProperties.getAccessKeySecret(),
+                "GET",
+                parameters
+        );
 
-            HttpHeaders httpHeaders = new HttpHeaders();
-            headers.forEach(httpHeaders::add);
-            HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        headers.forEach(httpHeaders::add);
+        HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
 
-            return restClient.method(HttpMethod.GET)
-                    .uri(aliyunIsiProperties.getEndpoint() + "?" + buildQueryString(parameters))
-                    .body(entity)
-                    .retrieve()
-                    .body(IsiTaskVo.class);
-        }, aliyunIsiProperties.getMaxRetries(), aliyunIsiProperties.getRetryInterval());
+        return restClient.method(HttpMethod.GET)
+                .uri(aliyunIsiProperties.getEndpoint() + "?" + buildQueryString(parameters))
+                .body(entity)
+                .retrieve()
+                .body(IsiTaskVo.class);
     }
+
 
     /**
      * 构建提交任务参数
@@ -96,7 +88,7 @@ public class AliyunIsiServiceImpl implements IAliyunIsiService {
         parameters.put("FileLink", taskBo.getFileLink());
         parameters.put("Format", taskBo.getFormat());
         parameters.put("Duration", String.valueOf(taskBo.getDuration()));
-        
+
         if (taskBo.getTaskName() != null) {
             parameters.put("TaskName", taskBo.getTaskName());
         }
@@ -130,7 +122,7 @@ public class AliyunIsiServiceImpl implements IAliyunIsiService {
         if (taskBo.getChannelNum() != null) {
             parameters.put("ChannelNum", String.valueOf(taskBo.getChannelNum()));
         }
-        
+
         return parameters;
     }
 
@@ -171,4 +163,5 @@ public class AliyunIsiServiceImpl implements IAliyunIsiService {
         }
         return sb.toString();
     }
-} 
+
+}

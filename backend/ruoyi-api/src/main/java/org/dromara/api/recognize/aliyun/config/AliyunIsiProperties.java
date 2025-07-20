@@ -1,7 +1,6 @@
-package org.dromara.api.aliyun.isi.config;
+package org.dromara.api.recognize.aliyun.config;
 
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "aliyun.isi")
 public class AliyunIsiProperties {
 
     /**

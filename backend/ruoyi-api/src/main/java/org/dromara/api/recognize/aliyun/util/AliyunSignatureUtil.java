@@ -1,4 +1,4 @@
-package org.dromara.api.aliyun.isi.util;
+package org.dromara.api.recognize.aliyun.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
@@ -63,7 +63,7 @@ public class AliyunSignatureUtil {
             return headers;
         } catch (Exception e) {
             log.error("生成阿里云API签名失败", e);
-            throw new ServiceException("生成签名失败", e);
+            throw new ServiceException("dsd");
         }
     }
 

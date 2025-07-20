@@ -1,4 +1,4 @@
-package org.dromara.api.aliyun.isi.domain.bo;
+package org.dromara.api.recognize.aliyun.domain.bo;
 
 import lombok.Data;
 import lombok.Builder;

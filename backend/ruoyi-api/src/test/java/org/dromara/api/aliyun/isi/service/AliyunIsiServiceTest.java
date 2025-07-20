@@ -1,9 +1,9 @@
 package org.dromara.api.aliyun.isi.service;
 
-import org.dromara.api.aliyun.isi.config.AliyunIsiProperties;
-import org.dromara.api.aliyun.isi.domain.bo.IsiTaskBo;
-import org.dromara.api.aliyun.isi.domain.vo.IsiTaskVo;
-import org.dromara.api.aliyun.isi.service.impl.AliyunIsiServiceImpl;
+import org.dromara.api.recognize.aliyun.config.AliyunIsiProperties;
+import org.dromara.api.recognize.aliyun.domain.bo.IsiTaskBo;
+import org.dromara.api.recognize.aliyun.domain.vo.IsiTaskVo;
+import org.dromara.api.recognize.aliyun.isi.service.impl.AliyunIsiServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

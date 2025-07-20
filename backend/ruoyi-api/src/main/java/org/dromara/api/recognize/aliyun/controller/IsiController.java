@@ -1,11 +1,12 @@
-package org.dromara.api.aliyun.isi.controller;
+package org.dromara.api.recognize.aliyun.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.api.aliyun.isi.domain.bo.IsiTaskBo;
-import org.dromara.api.aliyun.isi.domain.vo.IsiTaskVo;
-import org.dromara.api.aliyun.isi.service.IAliyunIsiService;
+import org.dromara.api.recognize.aliyun.AliyunVoiceRecognizeApi;
+import org.dromara.api.recognize.aliyun.domain.bo.IsiTaskBo;
+import org.dromara.api.recognize.aliyun.domain.vo.IsiTaskVo;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
@@ -28,7 +29,8 @@ import jakarta.validation.constraints.NotBlank;
 @RequestMapping("/api/isi")
 public class IsiController extends BaseController {
 
-    private final IAliyunIsiService aliyunIsiService;
+    @Resource
+    private final AliyunVoiceRecognizeApi aliyunVoiceRecognizeApi;
 
     /**
      * 提交录音文件识别任务
@@ -40,7 +42,7 @@ public class IsiController extends BaseController {
         log.info("接收到录音文件识别任务请求: {}", taskBo.getFileLink());
         
         try {
-            IsiTaskVo response = aliyunIsiService.submitTask(taskBo);
+            IsiTaskVo response = aliyunVoiceRecognizeApi.submitTask(taskBo);
             log.info("录音文件识别任务提交成功，任务ID: {}", response.getTaskId());
             return R.ok(response);
         } catch (Exception e) {
@@ -58,7 +60,7 @@ public class IsiController extends BaseController {
         log.info("查询录音文件识别任务状态: {}", taskId);
         
         try {
-            IsiTaskVo response = aliyunIsiService.queryTask(taskId);
+            IsiTaskVo response = aliyunVoiceRecognizeApi.queryTask(taskId);
             log.info("录音文件识别任务状态查询成功，任务ID: {}", taskId);
             return R.ok(response);
         } catch (Exception e) {
